@@ -1,3 +1,8 @@
+#To turn off press CTRL+Shift+Q
+#To turn back on just re run the file
+#SAVE AS .PY!!!
+
+
 import time
 import keyboard
 import requests
@@ -79,7 +84,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-#To turn off press CTRL+Shift+Q
-#To turn back on just re run the file
-#SAVE AS .PY!!!
